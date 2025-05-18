@@ -1,17 +1,18 @@
-function createCourseRoutes(app) {
-  app.post("/course/purchase", (req, res) => {
-    res.json({
-      message: "Buy this course!",
-    });
-  });
+const { Router } = require("express");
+const courseRouter = Router();
 
-  app.get("/course/preview", (req, res) => {
-    res.json({
-      message: "All the courses here!",
-    });
+courseRouter.post("/course/purchase", (req, res) => {
+  res.json({
+    message: "Buy this course!",
   });
-}
+});
+
+courseRouter.get("/course/preview", (req, res) => {
+  res.json({
+    message: "All the courses here!",
+  });
+});
 
 module.exports = {
-  createCourseRoutes: createCourseRoutes,
+  courseRouter: courseRouter,
 };
