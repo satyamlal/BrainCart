@@ -31,5 +31,5 @@ adminRouter.get("/course/bulk", (req, res) => {
       "This page will show all the courses to the Admin that the Admin has created.",
   });
 });
-
+ 
 module.exports = { adminRouter: adminRouter };

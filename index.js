@@ -1,15 +1,19 @@
 const express = require("express");
-const app = express();
-const port = 3000;
 const { userRouter } = require("./routes/user");
 const { courseRouter } = require("./routes/course");
+const { adminRouter } = require("./routes/admin");
+const app = express();
 
-app.use("/user", userRouter);
-app.use("/course", courseRouter);
+const port = 3000;
 
-createUserRoutes(app);
-createCourseRoutes(app);
+app.use("/api/v1/user", userRouter);
+app.use("/api/v1/admin", adminRouter);
+app.use("/api/v1/course", courseRouter);
+
+app.get("/", (req, res) => {
+  res.send("This is the home page!");
+});
 
 app.listen(port, () => {
-  console.log(`Server is listening to Port {port}`);
+  console.log(`Server is listening to Port ${port}`);
 });
