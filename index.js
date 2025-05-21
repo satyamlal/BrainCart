@@ -1,9 +1,11 @@
 const express = require("express");
+const mongoose = require("mongoose");
+
 const { userRouter } = require("./routes/user");
 const { courseRouter } = require("./routes/course");
 const { adminRouter } = require("./routes/admin");
-const app = express();
 
+const app = express();
 const port = 3000;
 
 app.use("/api/v1/user", userRouter);
@@ -14,6 +16,14 @@ app.get("/", (req, res) => {
   res.send("This is the home page!");
 });
 
-app.listen(port, () => {
-  console.log(`Server is listening to Port ${port}`);
-});
+async function main() {
+  await mongoose.connect(
+    "mongodb+srv://ssatyamlal:RKJXGKJVRMok4cCx@cluster0-coursesellinga.sasqe7z.mongodb.net/coursera-app"
+  );
+
+  app.listen(port, () => {
+    console.log(`Server is listening to Port ${port}`);
+  });
+}
+
+main();
