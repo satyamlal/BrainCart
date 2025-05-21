@@ -1,5 +1,6 @@
 const { Router } = require("express");
 const adminRouter = Router();
+const { adminModel } = require("../db");
 
 adminRouter.post("/login", (req, res) => {
   res.json({
@@ -31,5 +32,5 @@ adminRouter.get("/course/bulk", (req, res) => {
       "This page will show all the courses to the Admin that the Admin has created.",
   });
 });
- 
+
 module.exports = { adminRouter: adminRouter };
