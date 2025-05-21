@@ -8,6 +8,8 @@ const { courseRouter } = require("./routes/course");
 const { adminRouter } = require("./routes/admin");
 
 const app = express();
+app.use(express.json());
+
 const port = process.env.PORT || 3000;
 
 app.use("/api/v1/user", userRouter);
