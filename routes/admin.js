@@ -1,17 +1,51 @@
 const { Router } = require("express");
 const adminRouter = Router();
 const { adminModel } = require("../db");
+const jwt = require("jsonwebtoken");
+const JWT_ADMIN_PASSWORD = "345345345";
 
-adminRouter.post("/login", (req, res) => {
+adminRouter.post("/signup", async (req, res) => {
+  const { email, password, firstName, lastName } = req.body;
+
+  await adminModel.create({
+    email: email,
+    password: password,
+    firstName: firstName,
+    lastName: lastName,
+  });
+
   res.json({
-    message: "Admin login Page!",
+    message: "Admin signup succeeded!",
   });
 });
 
-adminRouter.post("/signup", (req, res) => {
-  res.json({
-    message: "Admin signup page!",
+adminRouter.post("/signin", async (req, res) => {
+  const { email, password } = req.body;
+
+  // TODO : ideally password should be hashed, and hence you can't compare the user provided password and the database password
+  const admin = await adminModel.findOne({
+    email: email,
+    password: password,
   });
+
+  if (admin) {
+    const token = jwt.sign(
+      {
+        id: admin._id,
+      },
+      JWT_ADMIN_PASSWORD
+    );
+
+    // Do cookie logic here
+
+    res.json({
+      token: token,
+    });
+  } else {
+    res.status(403).json({
+      message: "Invalid Admin Credentials!",
+    });
+  }
 });
 
 adminRouter.post("/course", (req, res) => {

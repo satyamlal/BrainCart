@@ -1,7 +1,7 @@
 const { Router } = require("express");
 const { userModel } = require("../db");
 const jwt = require("jsonwebtoken");
-const JWT_USER_PASSWORD = "aslkjfsdl23424";
+const JWT_USER_PASSWORD = "123123";
 
 const userRouter = Router();
 
@@ -24,7 +24,12 @@ userRouter.post("/signup", async (req, res) => {
 
 userRouter.post("/signin", async (req, res) => {
   const { email, password } = req.body;
-  const user = await userModel.find({ email, password });
+
+  // TODO : ideally password should be hashed, and hence you can't compare the user provided password and the database password
+  const user = await userModel.findOne({
+    email,
+    password,
+  });
 
   if (user) {
     const token = jwt.sign(
@@ -34,13 +39,15 @@ userRouter.post("/signin", async (req, res) => {
       JWT_USER_PASSWORD
     );
 
+    // Do cookie logic here
+
     // currently we are doing token based authentication, which is why we will send res.json()
     res.json({
       token: token,
     });
   } else {
-    res.json({
-      message: "Incorrect Credentials!",
+    res.status(403).json({
+      message: "Incorrect User Credentials!",
     });
   }
 });
