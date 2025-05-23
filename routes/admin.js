@@ -7,6 +7,16 @@ const JWT_ADMIN_PASSWORD = "345345345";
 adminRouter.post("/signup", async (req, res) => {
   const { email, password, firstName, lastName } = req.body;
 
+  const existingAdmin = await adminModel.findOne({
+    email: email,
+  });
+
+  if (existingAdmin) {
+    return res.status(409).json({
+      message: "Admin already exists!",
+    });
+  }
+
   await adminModel.create({
     email: email,
     password: password,
