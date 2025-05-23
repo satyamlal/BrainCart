@@ -1,8 +1,10 @@
+// require("dotenv").config({ path: "../config.env" });
+
 const { Router } = require("express");
 const adminRouter = Router();
 const { adminModel } = require("../db");
 const jwt = require("jsonwebtoken");
-const JWT_ADMIN_PASSWORD = "345345345";
+const JWT_ADMIN_PASSWORD = process.env.JWT_ADMIN_PASSWORD;
 
 adminRouter.post("/signup", async (req, res) => {
   const { email, password, firstName, lastName } = req.body;
