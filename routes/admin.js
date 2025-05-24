@@ -71,6 +71,7 @@ adminRouter.post("/course", adminMiddleware, async (req, res) => {
     title: title,
     description: description,
     imageUrl: imageUrl,
+    price: price,
     creatorId: adminId,
   });
 
@@ -80,7 +81,26 @@ adminRouter.post("/course", adminMiddleware, async (req, res) => {
   });
 });
 
-adminRouter.put("/course", (req, res) => {
+adminRouter.put("/course", adminMiddleware, async (req, res) => {
+  const adminId = req.adminId;
+
+  const { title, description, price, imageUrl, courseId } = req.body;
+
+  const matchCourse = // check for course and admin 
+
+  const course = await courseModel.updateOne(
+    {
+      _id: courseId,
+      creatorId: adminId,
+    },
+    {
+      title: title,
+      description,
+      price,
+      imageUrl: imageUrl,
+    }
+  );
+
   res.json({
     message: "Admin can change the name, price or image of the course here!",
   });
