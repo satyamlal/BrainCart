@@ -86,7 +86,19 @@ adminRouter.put("/course", adminMiddleware, async (req, res) => {
 
   const { title, description, price, imageUrl, courseId } = req.body;
 
-  const matchCourse = // check for course and admin 
+  const checkCourse = await courseModel.findById({ courseId });
+
+  if (!checkCourse) {
+    return res.status(404).json({
+      message: "Course not found!",
+    });
+  }
+
+  if (checkCourse.creatorId.toString() !== adminId) {
+    return res.status(403).json({
+      message: "Not authorized to update this course!",
+    });
+  }
 
   const course = await courseModel.updateOne(
     {
@@ -98,11 +110,15 @@ adminRouter.put("/course", adminMiddleware, async (req, res) => {
       description,
       price,
       imageUrl: imageUrl,
+    },
+    {
+      new: true,
     }
   );
 
   res.json({
-    message: "Admin can change the name, price or image of the course here!",
+    message: "Course Updated!",
+    courseId: course._id,
   });
 });
 
