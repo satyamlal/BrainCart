@@ -5,6 +5,7 @@ const adminRouter = Router();
 const { adminModel, courseModel } = require("../db");
 const jwt = require("jsonwebtoken");
 const { adminMiddleware } = require("../middleware/admin");
+const admin = require("../middleware/admin");
 
 const JWT_ADMIN_PASSWORD = process.env.JWT_ADMIN_PASSWORD;
 
@@ -117,15 +118,21 @@ adminRouter.put("/course", adminMiddleware, async (req, res) => {
   );
 
   res.json({
-    message: "Course Updated!",
+    message: `Course Updated for ${adminId}`,
     courseId: course._id,
   });
 });
 
-adminRouter.get("/course/bulk", (req, res) => {
+adminRouter.get("/course/bulk", async (req, res) => {
+  const userId = req.userId;
+
+  const course = await courseModel.find({
+    courseId: userId,
+  });
+
   res.json({
-    message:
-      "This page will show all the courses to the Admin that the Admin has created.",
+    message: "Your Courses!",
+    course,
   });
 });
 
