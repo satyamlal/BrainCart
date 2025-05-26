@@ -6,16 +6,14 @@ const mongoose = require("mongoose");
 const { userRouter } = require("./routes/user");
 const { courseRouter } = require("./routes/course");
 const { adminRouter } = require("./routes/admin");
-const { userMiddleware } = require("./middleware/user");
-const { adminMiddleware } = require("./middleware/admin");
 
 const app = express();
 app.use(express.json());
 
 const port = process.env.PORT || 3000;
 
-app.use("/api/v1/user", userMiddleware, userRouter);
-app.use("/api/v1/admin", adminMiddleware, adminRouter);
+app.use("/api/v1/user", userRouter);
+app.use("/api/v1/admin", adminRouter);
 app.use("/api/v1/course", courseRouter);
 
 app.get("/", (req, res) => {

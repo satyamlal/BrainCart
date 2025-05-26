@@ -5,7 +5,6 @@ const adminRouter = Router();
 const { adminModel, courseModel } = require("../db");
 const jwt = require("jsonwebtoken");
 const { adminMiddleware } = require("../middleware/admin");
-const admin = require("../middleware/admin");
 
 const JWT_ADMIN_PASSWORD = process.env.JWT_ADMIN_PASSWORD;
 
@@ -123,7 +122,7 @@ adminRouter.put("/course", adminMiddleware, async (req, res) => {
   });
 });
 
-adminRouter.get("/course/bulk", async (req, res) => {
+adminRouter.get("/course/bulk", adminMiddleware, async (req, res) => {
   const userId = req.userId;
 
   const course = await courseModel.find({
