@@ -3,6 +3,7 @@
 const { Router } = require("express");
 const { userModel, purchaseModel } = require("../db");
 const jwt = require("jsonwebtoken");
+const { userMiddleware } = require("../middleware/user");
 const JWT_USER_PASSWORD = process.env.JWT_USER_PASSWORD;
 
 const userRouter = Router();
@@ -54,7 +55,7 @@ userRouter.post("/signin", async (req, res) => {
   }
 });
 
-userRouter.post("/purchases", (req, res) => {
+userRouter.post("/purchases", userMiddleware, async (req, res) => {
   // you would expect the user to pay you money
   try {
     const userId = req.userId;
@@ -71,7 +72,8 @@ userRouter.post("/purchases", (req, res) => {
       });
     }
 
-    await = purchaseModel.create({
+    // Create a new course if not already bought
+    await purchaseModel.create({
       userId,
       courseId,
     });
@@ -87,14 +89,45 @@ userRouter.post("/purchases", (req, res) => {
   }
 });
 
-userRouter.get("/preview", async (req, res) => {
+userRouter.get("/preview", userMiddleware, async (req, res) => {
   const userId = req.userId;
-  const courseId = req.body.courseId;
 
-  if()
-  res.json({
-    message: "Course Preview endpoint!",
+  try {
+    const purchases = await purchaseModel.find({ userId });
+
+    const courseIds = purchases.map((p) => p.courseId);
+
+    const courses = await courseModel.find({
+      _id: { $in: courseIds },
+    });
+
+    res.status(200).json({
+      message: "You bought these courses!",
+    });
+  } catch (error) {
+    console.log("Error fetching purchases courses", err);
+    res.status(500).json({
+      message: "Internal server error in fetching purchased courses!",
+    });
+  }
+});
+
+userRouter.get("/preview/:courseId", userMiddleware, async (req, res) => {
+  const userId = req.userId;
+  const courseId = req.params.courseId;
+
+  const purchase = await purchaseModel.findOne({
+    userId,
+    courseId,
   });
+
+  if (!purchase) {
+    return res.status(403).json({
+      message: "Add this course to your cart!",
+    });
+  }
+
+  res.status(200).json({ message: "Here is your course: ", course });
 });
 
 module.exports = {
