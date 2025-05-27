@@ -130,6 +130,25 @@ userRouter.get("/preview/:courseId", userMiddleware, async (req, res) => {
   res.status(200).json({ message: "Here is your course: ", course });
 });
 
+userRouter.get("/purchase", userMiddleware, async (req, res) => {
+  const userId = req.userId;
+
+  try {
+    const purchases = await purchaseModel.find({
+      userId,
+    });
+
+    res.status(200).json({
+      message: "All your purchased courses!",
+    });
+  } catch (error) {
+    console.log(error);
+    res.json({
+      message: "Error finding your courses!",
+    });
+  }
+});
+
 module.exports = {
   userRouter: userRouter,
 };
