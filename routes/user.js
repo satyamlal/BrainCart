@@ -1,7 +1,7 @@
 // require("./dotenv").config({ path: "../config.env" });
 
 const { Router } = require("express");
-const { userModel } = require("../db");
+const { userModel, purchaseModel } = require("../db");
 const jwt = require("jsonwebtoken");
 const JWT_USER_PASSWORD = process.env.JWT_USER_PASSWORD;
 
@@ -54,9 +54,46 @@ userRouter.post("/signin", async (req, res) => {
   }
 });
 
-userRouter.get("/purchases", (req, res) => {
+userRouter.post("/purchases", (req, res) => {
+  // you would expect the user to pay you money
+  try {
+    const userId = req.userId;
+    const courseId = req.body.courseId;
+
+    const purchasedCourses = purchaseModel.findOne({
+      userId,
+      courseId,
+    });
+
+    if (purchasedCourses) {
+      return res.status(400).json({
+        message: "You already bought this course!",
+      });
+    }
+
+    await = purchaseModel.create({
+      userId,
+      courseId,
+    });
+
+    res.json({
+      message: "You bought a new course!",
+    });
+  } catch (err) {
+    console.log("Error purchasing course!");
+    res.status(500).json({
+      message: "Internal server error while buying a new course!",
+    });
+  }
+});
+
+userRouter.get("/preview", async (req, res) => {
+  const userId = req.userId;
+  const courseId = req.body.courseId;
+
+  if()
   res.json({
-    message: "All my purchased courses!",
+    message: "Course Preview endpoint!",
   });
 });
 

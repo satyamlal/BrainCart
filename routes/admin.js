@@ -82,44 +82,53 @@ adminRouter.post("/course", adminMiddleware, async (req, res) => {
 });
 
 adminRouter.put("/course", adminMiddleware, async (req, res) => {
-  const adminId = req.adminId;
+  try {
+    const adminId = req.adminId;
 
-  const { title, description, price, imageUrl, courseId } = req.body;
+    const { title, description, price, imageUrl, courseId } = req.body;
 
-  const checkCourse = await courseModel.findById({ courseId });
+    const checkCourse = await courseModel.findById(courseId);
 
-  if (!checkCourse) {
-    return res.status(404).json({
-      message: "Course not found!",
-    });
-  }
-
-  if (checkCourse.creatorId.toString() !== adminId) {
-    return res.status(403).json({
-      message: "Not authorized to update this course!",
-    });
-  }
-
-  const course = await courseModel.updateOne(
-    {
-      _id: courseId,
-      creatorId: adminId,
-    },
-    {
-      title: title,
-      description,
-      price,
-      imageUrl: imageUrl,
-    },
-    {
-      new: true,
+    if (!checkCourse) {
+      return res.status(404).json({
+        message: "Course not found!",
+      });
     }
-  );
 
-  res.json({
-    message: `Course Updated for ${adminId}`,
-    courseId: course._id,
-  });
+    // if (checkCourse.creatorId.toString() !== adminId) {
+    //   return res.status(403).json({
+    //     message: "Not authorized to update this course!",
+    //   });
+    // }
+
+    const adminName = await admin.findById(adminId);
+
+    const course = await courseModel.updateOne(
+      {
+        _id: courseId,
+        creatorId: adminId,
+      },
+      {
+        title: title,
+        description,
+        price,
+        imageUrl: imageUrl,
+      },
+      {
+        new: true,
+      }
+    );
+
+    res.json({
+      message: `Course Updated for ${adminName.firstName}`,
+      courseId: course._id,
+    });
+  } catch (err) {
+    console.log("Error updating the course!");
+    res.status(500).json({
+      message: "Internal Server Error while updating the course!",
+    });
+  }
 });
 
 adminRouter.get("/course/bulk", adminMiddleware, async (req, res) => {
