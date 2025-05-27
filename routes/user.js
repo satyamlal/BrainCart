@@ -55,40 +55,6 @@ userRouter.post("/signin", async (req, res) => {
   }
 });
 
-userRouter.post("/purchases", userMiddleware, async (req, res) => {
-  // you would expect the user to pay you money
-  try {
-    const userId = req.userId;
-    const courseId = req.body.courseId;
-
-    const purchasedCourses = purchaseModel.findOne({
-      userId,
-      courseId,
-    });
-
-    if (purchasedCourses) {
-      return res.status(400).json({
-        message: "You already bought this course!",
-      });
-    }
-
-    // Create a new course if not already bought
-    await purchaseModel.create({
-      userId,
-      courseId,
-    });
-
-    res.json({
-      message: "You bought a new course!",
-    });
-  } catch (err) {
-    console.log("Error purchasing course!");
-    res.status(500).json({
-      message: "Internal server error while buying a new course!",
-    });
-  }
-});
-
 userRouter.get("/preview", userMiddleware, async (req, res) => {
   const userId = req.userId;
 
@@ -130,6 +96,7 @@ userRouter.get("/preview/:courseId", userMiddleware, async (req, res) => {
   res.status(200).json({ message: "Here is your course: ", course });
 });
 
+//This route fetches a list of all courses the logged-in user has already purchased.
 userRouter.get("/purchase", userMiddleware, async (req, res) => {
   const userId = req.userId;
 
@@ -138,13 +105,57 @@ userRouter.get("/purchase", userMiddleware, async (req, res) => {
       userId,
     });
 
-    res.status(200).json({
-      message: "All your purchased courses!",
+    const purchasedCourseIds = purchases.map((p) => p.courseId);
+
+    const coursesData = await courseModel.find({
+      _id: {
+        $in: purchasedCourseIds,
+      },
+    });
+
+    res.json({
+      purchases,
+      coursesData,
     });
   } catch (error) {
     console.log(error);
     res.json({
       message: "Error finding your courses!",
+    });
+  }
+});
+
+// This route lets a user purchase a course (simulates a buy action).
+userRouter.post("/purchases", userMiddleware, async (req, res) => {
+  // you would expect the user to pay you money
+  try {
+    const userId = req.userId;
+    const courseId = req.body.courseId;
+
+    const purchasedCourses = await purchaseModel.findOne({
+      userId,
+      courseId,
+    });
+
+    if (purchasedCourses) {
+      return res.status(400).json({
+        message: "You already bought this course!",
+      });
+    }
+
+    // Create a new course if not already bought
+    await purchaseModel.create({
+      userId,
+      courseId,
+    });
+
+    res.json({
+      message: "You bought a new course!",
+    });
+  } catch (err) {
+    console.log("Error purchasing course!");
+    res.status(500).json({
+      message: "Internal server error while buying a new course!",
     });
   }
 });
